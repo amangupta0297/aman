@@ -20,11 +20,11 @@
           <description>Choose environment in which you want to add and remove the scm poll trigger.</description>
           <choices class="java.util.Arrays$ArrayList">
             <a class="string-array">
-#              <string>Dev</string>
-#              <string>QA</string>
-#              <string>Prod</string>
-#            </a>
-#          </choices>
+              <string>Dev</string>
+              <string>QA</string>
+              <string>Prod</string>
+            </a>
+          </choices>
         </hudson.model.ChoiceParameterDefinition>
         <hudson.model.ChoiceParameterDefinition>
           <name>OPERATION</name>
