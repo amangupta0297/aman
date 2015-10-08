@@ -11,9 +11,9 @@
   <keepDependencies>false</keepDependencies>
   <properties>
     <hudson.plugins.buildblocker.BuildBlockerProperty plugin="build-blocker-plugin@1.6">
-      <useBuildBlocker>false</useBuildBlocker>
-    </hudson.plugins.buildblocker.BuildBlockerProperty>
-    <hudson.model.ParametersDefinitionProperty>
+#      <useBuildBlocker>false</useBuildBlocker>
+#    </hudson.plugins.buildblocker.BuildBlockerProperty>
+#    <hudson.model.ParametersDefinitionProperty>
       <parameterDefinitions>
         <hudson.model.ChoiceParameterDefinition>
           <name>ENVIRONMENT</name>
