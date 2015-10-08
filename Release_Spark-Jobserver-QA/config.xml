@@ -1,0 +1,74 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<project>
+  <actions/>
+  <description></description>
+  <keepDependencies>false</keepDependencies>
+  <properties>
+    <hudson.plugins.buildblocker.BuildBlockerProperty plugin="build-blocker-plugin@1.6">
+      <useBuildBlocker>false</useBuildBlocker>
+    </hudson.plugins.buildblocker.BuildBlockerProperty>
+    <hudson.model.ParametersDefinitionProperty>
+      <parameterDefinitions>
+        <hudson.model.StringParameterDefinition>
+          <name>IDENTIFIER</name>
+          <description></description>
+          <defaultValue>0.1</defaultValue>
+        </hudson.model.StringParameterDefinition>
+      </parameterDefinitions>
+    </hudson.model.ParametersDefinitionProperty>
+  </properties>
+  <scm class="hudson.plugins.git.GitSCM" plugin="git@2.3.5">
+    <configVersion>2</configVersion>
+    <userRemoteConfigs>
+      <hudson.plugins.git.UserRemoteConfig>
+        <url>git@github.com:BigParser/BigParser_BE.git</url>
+      </hudson.plugins.git.UserRemoteConfig>
+    </userRemoteConfigs>
+    <branches>
+      <hudson.plugins.git.BranchSpec>
+        <name>*/master</name>
+      </hudson.plugins.git.BranchSpec>
+    </branches>
+    <doGenerateSubmoduleConfigurations>false</doGenerateSubmoduleConfigurations>
+    <submoduleCfg class="list"/>
+    <extensions/>
+  </scm>
+  <canRoam>true</canRoam>
+  <disabled>false</disabled>
+  <blockBuildWhenDownstreamBuilding>false</blockBuildWhenDownstreamBuilding>
+  <blockBuildWhenUpstreamBuilding>false</blockBuildWhenUpstreamBuilding>
+  <triggers/>
+  <concurrentBuild>false</concurrentBuild>
+  <builders>
+    <hudson.tasks.Shell>
+      <command>#!/bin/bash
+
+releaseIdentifier=Release_Spark-Jobserver-QA_${IDENTIFIER}
+#SERVER=52.24.169.157
+
+rm -rf tokenizer/target/scala-2.10/BigParser-assembly-1.0.jar
+rm -rf tokenizer/target/*
+cd tokenizer
+sbt assembly
+if [ $? != 0 ]
+then
+	echo &quot;Build failed due to code is not compilable&quot;
+    exit 1
+fi
+cd ..
+
+
+#scp -o StrictHostKeyChecking=no tokenizer/target/scala-2.10/BigParser-assembly-1.0.jar hadoop@$SERVER:/tmp  
+#scp -o StrictHostKeyChecking=no tokenizer/src/main/resources/qa_local.conf hadoop@$SERVER:/home/hadoop/job-server/local.conf
+#ssh -o StrictHostKeyChecking=no hadoop@$SERVER &quot;curl --data-binary @/tmp/BigParser-assembly-1.0.jar localhost:8090/jars/bigparser&quot;
+#ssh -o StrictHostKeyChecking=no hadoop@$SERVER &quot;cp /tmp/BigParser-assembly-1.0.jar /home/hadoop/spark/user-jars/&quot;
+#ssh -o StrictHostKeyChecking=no hadoop@$SERVER &quot;rm -rf /tmp/BigParser-assembly-1.0.jar&quot;
+#ssh -o StrictHostKeyChecking=no hadoop@$SERVER &quot;/home/hadoop/job-server/server_stop.sh &amp;&amp; /home/hadoop/job-server/server_start.sh &amp;&amp; sleep 1m&quot;
+#ssh -o StrictHostKeyChecking=no hadoop@$SERVER &quot;curl -d &apos;&apos; &apos;localhost:8090/contexts/dataparsing-context?num-cpu-cores=4&amp;memory-per-node=512m&apos;&quot;
+
+${HOME}/scripts/releaseIdentifier.sh $releaseIdentifier ${WORKSPACE}/tokenizer/target/scala-2.10/BigParser-assembly-1.0.jar</command>
+    </hudson.tasks.Shell>
+  </builders>
+  <publishers/>
+  <buildWrappers/>
+</project>

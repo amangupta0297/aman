@@ -1,0 +1,108 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<project>
+  <actions/>
+  <description>I&apos;ll do deployment of jars on the spark jobserver on production </description>
+  <logRotator class="hudson.tasks.LogRotator">
+    <daysToKeep>100</daysToKeep>
+    <numToKeep>50</numToKeep>
+    <artifactDaysToKeep>-1</artifactDaysToKeep>
+    <artifactNumToKeep>-1</artifactNumToKeep>
+  </logRotator>
+  <keepDependencies>false</keepDependencies>
+  <properties>
+    <hudson.plugins.buildblocker.BuildBlockerProperty plugin="build-blocker-plugin@1.6">
+      <useBuildBlocker>false</useBuildBlocker>
+    </hudson.plugins.buildblocker.BuildBlockerProperty>
+  </properties>
+  <scm class="hudson.plugins.git.GitSCM" plugin="git@2.3.5">
+    <configVersion>2</configVersion>
+    <userRemoteConfigs>
+      <hudson.plugins.git.UserRemoteConfig>
+        <url>git@github.com:BigParser/BigParser_BE.git</url>
+      </hudson.plugins.git.UserRemoteConfig>
+    </userRemoteConfigs>
+    <branches>
+      <hudson.plugins.git.BranchSpec>
+        <name>5c136f2cbac9414e7fa0307fbd9c27ae364ef268</name>
+      </hudson.plugins.git.BranchSpec>
+    </branches>
+    <doGenerateSubmoduleConfigurations>false</doGenerateSubmoduleConfigurations>
+    <submoduleCfg class="list"/>
+    <extensions/>
+  </scm>
+  <canRoam>true</canRoam>
+  <disabled>false</disabled>
+  <blockBuildWhenDownstreamBuilding>false</blockBuildWhenDownstreamBuilding>
+  <blockBuildWhenUpstreamBuilding>false</blockBuildWhenUpstreamBuilding>
+  <triggers/>
+  <concurrentBuild>false</concurrentBuild>
+  <builders>
+    <hudson.tasks.Shell>
+      <command>#!/bin/bash
+
+rm -rf tokenizer/target/scala-2.10/BigParser-assembly-1.0.jar
+rm -rf tokenizer/target/*
+cd tokenizer
+sbt clean
+sbt assembly
+if [ $? != 0 ]
+then
+	echo &quot;Build failed due to code is not compilable&quot;
+    exit 1
+fi
+cd ..
+
+scp tokenizer/target/scala-2.10/BigParser-assembly-1.0.jar prod-hadoop-jobserver.bigparser.com:/tmp 
+scp tokenizer/src/main/resources/dev_local.conf prod-hadoop-jobserver.bigparser.com:/home/hadoop/job-server/local.conf
+ssh prod-hadoop-jobserver.bigparser.com &quot;curl --data-binary @/tmp/BigParser-assembly-1.0.jar localhost:8090/jars/bigparser&quot;
+ssh prod-hadoop-jobserver.bigparser.com &quot;cp /tmp/BigParser-assembly-1.0.jar /home/hadoop/spark/user-jars/&quot;
+ssh prod-hadoop-jobserver.bigparser.com &quot;rm -rf /tmp/BigParser-assembly-1.0.jar&quot;
+#ssh -o StrictHostKeyChecking=no hadoop@$SERVER &quot;curl -X DELETE &apos;localhost:8090/contexts/dataparsing-context&apos;&quot;
+ssh prod-hadoop-jobserver.bigparser.com &quot;/home/hadoop/job-server/server_stop.sh &amp;&amp; /home/hadoop/job-server/server_start.sh &amp;&amp; sleep 1m&quot;
+#ssh -o StrictHostKeyChecking=no hadoop@$SERVER &quot;curl -d &apos;&apos; &apos;localhost:8090/contexts/dataparsing-context?num-cpu-cores=4&amp;memory-per-node=512m&apos;&quot;</command>
+    </hudson.tasks.Shell>
+  </builders>
+  <publishers>
+    <hudson.plugins.emailext.ExtendedEmailPublisher plugin="email-ext@2.39.3">
+      <recipientList>$BACKEND_RECIPIENT</recipientList>
+      <configuredTriggers>
+        <hudson.plugins.emailext.plugins.trigger.AlwaysTrigger>
+          <email>
+            <recipientList>$BACKEND_RECIPIENT</recipientList>
+            <subject>$PROJECT_DEFAULT_SUBJECT</subject>
+            <body>$PROJECT_DEFAULT_CONTENT</body>
+            <recipientProviders>
+              <hudson.plugins.emailext.plugins.recipients.DevelopersRecipientProvider/>
+              <hudson.plugins.emailext.plugins.recipients.ListRecipientProvider/>
+            </recipientProviders>
+            <attachmentsPattern></attachmentsPattern>
+            <attachBuildLog>false</attachBuildLog>
+            <compressBuildLog>false</compressBuildLog>
+            <replyTo>$PROJECT_DEFAULT_REPLYTO</replyTo>
+            <contentType>project</contentType>
+          </email>
+        </hudson.plugins.emailext.plugins.trigger.AlwaysTrigger>
+      </configuredTriggers>
+      <contentType>default</contentType>
+      <defaultSubject>$DEFAULT_SUBJECT</defaultSubject>
+      <defaultContent>$DEFAULT_CONTENT
+jobserver&apos;s UI url
+http://54.200.162.159:8090/</defaultContent>
+      <attachmentsPattern></attachmentsPattern>
+      <presendScript>$DEFAULT_PRESEND_SCRIPT</presendScript>
+      <attachBuildLog>false</attachBuildLog>
+      <compressBuildLog>false</compressBuildLog>
+      <replyTo>$DEFAULT_REPLYTO</replyTo>
+      <saveOutput>false</saveOutput>
+      <disabled>true</disabled>
+    </hudson.plugins.emailext.ExtendedEmailPublisher>
+  </publishers>
+  <buildWrappers>
+    <EnvInjectBuildWrapper plugin="envinject@1.91.1">
+      <info>
+        <propertiesFilePath>/var/lib/jenkins/scripts/email_recipient</propertiesFilePath>
+        <loadFilesFromMaster>false</loadFilesFromMaster>
+      </info>
+    </EnvInjectBuildWrapper>
+  </buildWrappers>
+</project>

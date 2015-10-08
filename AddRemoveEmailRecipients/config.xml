@@ -1,0 +1,108 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<project>
+  <actions/>
+  <description>I&apos;ll add and remove Email recipients form the the email recipients file </description>
+  <logRotator class="hudson.tasks.LogRotator">
+    <daysToKeep>100</daysToKeep>
+    <numToKeep>100</numToKeep>
+    <artifactDaysToKeep>-1</artifactDaysToKeep>
+    <artifactNumToKeep>-1</artifactNumToKeep>
+  </logRotator>
+  <keepDependencies>false</keepDependencies>
+  <properties>
+    <hudson.plugins.buildblocker.BuildBlockerProperty plugin="build-blocker-plugin@1.6">
+      <useBuildBlocker>false</useBuildBlocker>
+    </hudson.plugins.buildblocker.BuildBlockerProperty>
+    <hudson.model.ParametersDefinitionProperty>
+      <parameterDefinitions>
+        <hudson.model.ChoiceParameterDefinition>
+          <name>GROUPS</name>
+          <description></description>
+          <choices class="java.util.Arrays$ArrayList">
+            <a class="string-array">
+              <string>FRONTEND_RECIPIENT</string>
+              <string>BACKEND_RECIPIENT</string>
+              <string>OPSCLICK_BACKEND_RECIPIENT</string>
+              <string>OPSCLICK_FRONTEND_RECIPIENT</string>
+            </a>
+          </choices>
+        </hudson.model.ChoiceParameterDefinition>
+        <org.biouno.unochoice.CascadeChoiceParameter plugin="uno-choice@1.2">
+          <name>RECIPIENT</name>
+          <description></description>
+          <randomName>choice-parameter-3480298848328378</randomName>
+          <script class="org.biouno.unochoice.model.GroovyScript">
+            <script>def all_recipients = []
+def valuelist= []
+def count=0
+def groups= []
+def finallist = []
+
+new File( &apos;/var/lib/jenkins/scripts/all_recipients&apos; ).eachLine { line -&gt; all_recipients &lt;&lt; line }
+new File( &apos;/var/lib/jenkins/scripts/email_recipient&apos; ).eachLine{ line -&gt; groups &lt;&lt; line }
+
+for (item in groups){
+	count=0
+	item.tokenize(&quot;=&quot;).each{
+		valuelist[count]=it
+		count++
+	}
+	if (GROUPS.equals(valuelist[0])){
+		break;
+	}
+}
+
+if (count ==1){
+	count =0
+	for (item in all_recipients) { item.tokenize(&quot;,&quot;).each {
+		finallist[count] = it
+		count++
+		}
+	}
+}
+else{
+	def val = []
+	val = valuelist[1].tokenize(&quot;,&quot;)
+	count = 0
+	for (item in all_recipients) {
+		item.tokenize(&quot;,&quot;).each {
+			if (val.contains(it))
+				finallist[count] = it+&quot;:selected&quot;
+			else
+				finallist[count] = it
+		count++
+		}
+	}
+}
+
+finallist.each { 
+	println &quot;$it&quot;
+}</script>
+            <fallbackScript>return[&quot;Script Error&quot;]</fallbackScript>
+          </script>
+          <visibleItemCount>1</visibleItemCount>
+          <parameters class="linked-hash-map"/>
+          <referencedParameters>GROUPS</referencedParameters>
+          <choiceType>PT_CHECKBOX</choiceType>
+          <filterable>false</filterable>
+        </org.biouno.unochoice.CascadeChoiceParameter>
+      </parameterDefinitions>
+    </hudson.model.ParametersDefinitionProperty>
+  </properties>
+  <scm class="hudson.scm.NullSCM"/>
+  <canRoam>true</canRoam>
+  <disabled>false</disabled>
+  <blockBuildWhenDownstreamBuilding>false</blockBuildWhenDownstreamBuilding>
+  <blockBuildWhenUpstreamBuilding>false</blockBuildWhenUpstreamBuilding>
+  <triggers/>
+  <concurrentBuild>false</concurrentBuild>
+  <builders>
+    <hudson.tasks.Shell>
+      <command>#!/bin/bash
+sed -i &quot;/${GROUPS}/c ${GROUPS}=${recipientNames}&quot; $JENKINS_HOME/scripts/email_recipient
+</command>
+    </hudson.tasks.Shell>
+  </builders>
+  <publishers/>
+  <buildWrappers/>
+</project>

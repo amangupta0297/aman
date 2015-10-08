@@ -1,0 +1,55 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<project>
+  <actions/>
+  <description>I&apos;ll setup replicated mongo</description>
+  <keepDependencies>false</keepDependencies>
+  <properties>
+    <hudson.plugins.buildblocker.BuildBlockerProperty plugin="build-blocker-plugin@1.6">
+      <useBuildBlocker>false</useBuildBlocker>
+    </hudson.plugins.buildblocker.BuildBlockerProperty>
+    <hudson.model.ParametersDefinitionProperty>
+      <parameterDefinitions>
+        <hudson.model.StringParameterDefinition>
+          <name>MONGO_MASTER_IP</name>
+          <description>Ip of mongo master server</description>
+          <defaultValue></defaultValue>
+        </hudson.model.StringParameterDefinition>
+        <hudson.model.StringParameterDefinition>
+          <name>MONGO_SLAVES_IP</name>
+          <description>Ip of mongo slave server(s)(comma separated values)</description>
+          <defaultValue></defaultValue>
+        </hudson.model.StringParameterDefinition>
+        <hudson.model.StringParameterDefinition>
+          <name>MONGO_ARBITER_IP</name>
+          <description>Ip of Mongo Arbiter Server</description>
+          <defaultValue></defaultValue>
+        </hudson.model.StringParameterDefinition>
+      </parameterDefinitions>
+    </hudson.model.ParametersDefinitionProperty>
+  </properties>
+  <scm class="hudson.scm.NullSCM"/>
+  <canRoam>true</canRoam>
+  <disabled>false</disabled>
+  <blockBuildWhenDownstreamBuilding>false</blockBuildWhenDownstreamBuilding>
+  <blockBuildWhenUpstreamBuilding>false</blockBuildWhenUpstreamBuilding>
+  <triggers/>
+  <concurrentBuild>false</concurrentBuild>
+  <builders>
+    <hudson.tasks.Shell>
+      <command>#/bin/bash
+
+echo &quot;I&apos;ll do a replicated mongo setup on the list of provided IP&apos;s&quot;
+echo &quot;mongo_master=${MONGO_MASTER_IP}&quot; &gt; replicated_mongo_setup.properties
+echo &quot;mongo_slaves=${MONGO_SLAVES_IP}&quot; &gt;&gt; replicated_mongo_setup.properties
+echo &quot;mongo_arbiter=${MONGO_ARBITER_IP}&quot; &gt;&gt; replicated_mongo_setup.properties
+
+
+echo &quot;Meta file for replicated mongo setup is&quot;
+cat replicated_mongo_setup.properties
+
+#setupReplicatedMongos.sh replicated_mongo_setup.properties</command>
+    </hudson.tasks.Shell>
+  </builders>
+  <publishers/>
+  <buildWrappers/>
+</project>

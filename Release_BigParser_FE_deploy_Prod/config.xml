@@ -1,0 +1,81 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<project>
+  <actions/>
+  <description>I&apos;ll do continuous deployment of BigParser Frontent webapp on the target server (Production environment).</description>
+  <keepDependencies>false</keepDependencies>
+  <properties>
+    <hudson.plugins.buildblocker.BuildBlockerProperty plugin="build-blocker-plugin@1.6">
+      <useBuildBlocker>false</useBuildBlocker>
+    </hudson.plugins.buildblocker.BuildBlockerProperty>
+    <hudson.model.ParametersDefinitionProperty>
+      <parameterDefinitions>
+        <hudson.model.StringParameterDefinition>
+          <name>IDENTIFIER</name>
+          <description></description>
+          <defaultValue>0.1</defaultValue>
+        </hudson.model.StringParameterDefinition>
+      </parameterDefinitions>
+    </hudson.model.ParametersDefinitionProperty>
+  </properties>
+  <scm class="hudson.plugins.git.GitSCM" plugin="git@2.3.5">
+    <configVersion>2</configVersion>
+    <userRemoteConfigs>
+      <hudson.plugins.git.UserRemoteConfig>
+        <url>git@github.com:BigParser/BigParser_UI.git</url>
+      </hudson.plugins.git.UserRemoteConfig>
+    </userRemoteConfigs>
+    <branches>
+      <hudson.plugins.git.BranchSpec>
+        <name>*/integration</name>
+      </hudson.plugins.git.BranchSpec>
+    </branches>
+    <doGenerateSubmoduleConfigurations>false</doGenerateSubmoduleConfigurations>
+    <submoduleCfg class="list"/>
+    <extensions/>
+  </scm>
+  <canRoam>true</canRoam>
+  <disabled>false</disabled>
+  <blockBuildWhenDownstreamBuilding>false</blockBuildWhenDownstreamBuilding>
+  <blockBuildWhenUpstreamBuilding>false</blockBuildWhenUpstreamBuilding>
+  <triggers/>
+  <concurrentBuild>false</concurrentBuild>
+  <builders>
+    <hudson.tasks.Shell>
+      <command>#!/bin/bash +x
+
+releaseIdentifier=Release_BigParser_FE_deploy_Prod_${IDENTIFIER}
+
+echo &quot;copying the built script&quot;
+echo &quot;${HOME}/scripts/nodejs_install.sh&quot;
+
+cp ${HOME}/scripts/nodejs_install.sh .
+
+chmod +x nodejs_install.sh
+
+./nodejs_install.sh
+
+if [ $? != 0 ]
+then
+    echo &quot;Build failed due to npm build script failed&quot;
+    exit 1
+fi
+
+echo &quot;Removing the built script&quot;
+rm nodejs_install.sh
+
+tar -czf $HOME/releases/bigparser.tar.gz .
+
+
+#for az in a b
+#do
+#  echo &quot;prod-frontend-az-$az.bigparser.com&quot; 
+#  scp $HOME/releases/bigparser.tar.gz prod-frontend-az-$az.bigparser.com:/opt/bigparser
+#  ssh prod-frontend-az-$az.bigparser.com &apos;${HOME}/scripts/deployApp.sh bigparser&apos;
+#done
+
+${HOME}/scripts/releaseIdentifier.sh $releaseIdentifier $HOME/releases/bigparser.tar.gz</command>
+    </hudson.tasks.Shell>
+  </builders>
+  <publishers/>
+  <buildWrappers/>
+</project>

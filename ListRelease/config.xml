@@ -1,0 +1,43 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<project>
+  <actions/>
+  <description></description>
+  <keepDependencies>false</keepDependencies>
+  <properties>
+    <hudson.plugins.buildblocker.BuildBlockerProperty plugin="build-blocker-plugin@1.6">
+      <useBuildBlocker>false</useBuildBlocker>
+    </hudson.plugins.buildblocker.BuildBlockerProperty>
+    <hudson.model.ParametersDefinitionProperty>
+      <parameterDefinitions>
+        <com.cwctravel.hudson.plugins.extended__choice__parameter.ExtendedChoiceParameterDefinition plugin="extended-choice-parameter@0.37">
+          <name>RELEASES</name>
+          <description></description>
+          <quoteValue>false</quoteValue>
+          <visibleItemCount>20</visibleItemCount>
+          <type>PT_SINGLE_SELECT</type>
+          <value>Release_BigParser_BE_Deploy_Prod,Release_BigParser_BE_Deploy_QA,Release_BigParser_FE_deploy_QA,Release_BigParser_Common_Services_Internal_BE_Deploy_QA,Release_Spark-Jobserver-QA,Release_BigParser_FE_deploy_Prod,Release_Spark-Jobserver-Prod,Release_BigParser_Common_Services_Internal_BE_Deploy_Prod</value>
+          <multiSelectDelimiter>,</multiSelectDelimiter>
+        </com.cwctravel.hudson.plugins.extended__choice__parameter.ExtendedChoiceParameterDefinition>
+      </parameterDefinitions>
+    </hudson.model.ParametersDefinitionProperty>
+  </properties>
+  <scm class="hudson.scm.NullSCM"/>
+  <canRoam>true</canRoam>
+  <disabled>false</disabled>
+  <blockBuildWhenDownstreamBuilding>false</blockBuildWhenDownstreamBuilding>
+  <blockBuildWhenUpstreamBuilding>false</blockBuildWhenUpstreamBuilding>
+  <triggers/>
+  <concurrentBuild>false</concurrentBuild>
+  <builders>
+    <hudson.tasks.Shell>
+      <command>#!/bin/bash
+
+
+find /release/ -type d -name ${RELEASES}* |awk &apos;{gsub(&quot;&apos;/release/&apos;&quot;, &quot;&quot;);print}&apos;
+
+</command>
+    </hudson.tasks.Shell>
+  </builders>
+  <publishers/>
+  <buildWrappers/>
+</project>

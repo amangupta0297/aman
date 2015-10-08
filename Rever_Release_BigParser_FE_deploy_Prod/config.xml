@@ -1,0 +1,47 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<project>
+  <actions/>
+  <description>I&apos;ll do continuous deployment of BigParser Frontent webapp on the target server (Production environment).</description>
+  <keepDependencies>false</keepDependencies>
+  <properties>
+    <hudson.plugins.buildblocker.BuildBlockerProperty plugin="build-blocker-plugin@1.6">
+      <useBuildBlocker>false</useBuildBlocker>
+    </hudson.plugins.buildblocker.BuildBlockerProperty>
+    <hudson.model.ParametersDefinitionProperty>
+      <parameterDefinitions>
+        <hudson.model.StringParameterDefinition>
+          <name>IDENTIFIER</name>
+          <description></description>
+          <defaultValue>0.1</defaultValue>
+        </hudson.model.StringParameterDefinition>
+      </parameterDefinitions>
+    </hudson.model.ParametersDefinitionProperty>
+  </properties>
+  <scm class="hudson.scm.NullSCM"/>
+  <canRoam>true</canRoam>
+  <disabled>false</disabled>
+  <blockBuildWhenDownstreamBuilding>false</blockBuildWhenDownstreamBuilding>
+  <blockBuildWhenUpstreamBuilding>false</blockBuildWhenUpstreamBuilding>
+  <triggers/>
+  <concurrentBuild>false</concurrentBuild>
+  <builders>
+    <hudson.tasks.Shell>
+      <command>#!/bin/bash +x
+
+releaseIdentifier=Release_BigParser_FE_deploy_Prod_${IDENTIFIER}
+
+
+
+#for az in a b
+#do
+#  echo &quot;prod-frontend-az-$az.bigparser.com&quot; 
+#  scp /release/${releaseIdentifier}/bigparser.tar.gz prod-frontend-az-$az.bigparser.com:/opt/bigparser
+#  ssh prod-frontend-az-$az.bigparser.com &apos;${HOME}/scripts/deployApp.sh bigparser&apos;
+#done
+
+</command>
+    </hudson.tasks.Shell>
+  </builders>
+  <publishers/>
+  <buildWrappers/>
+</project>

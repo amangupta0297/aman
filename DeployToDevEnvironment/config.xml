@@ -1,0 +1,113 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<com.cloudbees.plugins.flow.BuildFlow plugin="build-flow-plugin@0.18">
+  <actions/>
+  <description></description>
+  <keepDependencies>false</keepDependencies>
+  <properties>
+    <hudson.plugins.buildblocker.BuildBlockerProperty plugin="build-blocker-plugin@1.6">
+      <useBuildBlocker>false</useBuildBlocker>
+    </hudson.plugins.buildblocker.BuildBlockerProperty>
+    <EnvInjectJobProperty plugin="envinject@1.91.1">
+      <info>
+        <loadFilesFromMaster>false</loadFilesFromMaster>
+      </info>
+      <on>true</on>
+      <keepJenkinsSystemVariables>true</keepJenkinsSystemVariables>
+      <keepBuildVariables>true</keepBuildVariables>
+      <overrideBuildParameters>false</overrideBuildParameters>
+      <contributors/>
+    </EnvInjectJobProperty>
+  </properties>
+  <scm class="hudson.scm.NullSCM"/>
+  <canRoam>true</canRoam>
+  <disabled>false</disabled>
+  <blockBuildWhenDownstreamBuilding>false</blockBuildWhenDownstreamBuilding>
+  <blockBuildWhenUpstreamBuilding>false</blockBuildWhenUpstreamBuilding>
+  <triggers/>
+  <concurrentBuild>false</concurrentBuild>
+  <builders/>
+  <publishers>
+    <hudson.plugins.emailext.ExtendedEmailPublisher plugin="email-ext@2.39.3">
+      <recipientList>$BACKEND_RECIPIENT</recipientList>
+      <configuredTriggers>
+        <hudson.plugins.emailext.plugins.trigger.FailureTrigger>
+          <email>
+            <recipientList></recipientList>
+            <subject>$PROJECT_DEFAULT_SUBJECT</subject>
+            <body>$PROJECT_DEFAULT_CONTENT</body>
+            <recipientProviders>
+              <hudson.plugins.emailext.plugins.recipients.ListRecipientProvider/>
+            </recipientProviders>
+            <attachmentsPattern></attachmentsPattern>
+            <attachBuildLog>false</attachBuildLog>
+            <compressBuildLog>false</compressBuildLog>
+            <replyTo>$PROJECT_DEFAULT_REPLYTO</replyTo>
+            <contentType>project</contentType>
+          </email>
+        </hudson.plugins.emailext.plugins.trigger.FailureTrigger>
+      </configuredTriggers>
+      <contentType>default</contentType>
+      <defaultSubject>$DEFAULT_SUBJECT: Dev Environment</defaultSubject>
+      <defaultContent>$DEFAULT_CONTENT
+Deployment to complete Dev environment done
+http://54.200.162.159/APIServices/health/monitor
+http://dev.bigparser.com/</defaultContent>
+      <attachmentsPattern></attachmentsPattern>
+      <presendScript>$DEFAULT_PRESEND_SCRIPT</presendScript>
+      <attachBuildLog>false</attachBuildLog>
+      <compressBuildLog>false</compressBuildLog>
+      <replyTo>$DEFAULT_REPLYTO</replyTo>
+      <saveOutput>false</saveOutput>
+      <disabled>false</disabled>
+    </hudson.plugins.emailext.ExtendedEmailPublisher>
+  </publishers>
+  <buildWrappers/>
+  <icon/>
+  <dsl>ignore(UNSTABLE) {
+build(&quot;Spark-Jobserver&quot;)
+}
+out.println(System.currentTimeMillis())
+Thread.sleep(1000)
+out.println(System.currentTimeMillis())
+
+ignore(UNSTABLE) {
+build(&quot;Property_Files_Deployer&quot;)
+}
+out.println(System.currentTimeMillis())
+Thread.sleep(1000)
+out.println(System.currentTimeMillis())
+
+ignore(UNSTABLE) {
+build(&quot;BigParser_Framework_BE&quot;)
+}
+out.println(System.currentTimeMillis())
+Thread.sleep(3000)
+out.println(System.currentTimeMillis())
+
+ignore(UNSTABLE) {
+build(&quot;BigParser_Common_Services_BE&quot;)
+}
+out.println(System.currentTimeMillis())
+Thread.sleep(3000)
+out.println(System.currentTimeMillis())
+
+ignore(UNSTABLE) {
+build(&quot;BigParser_BE_Deploy&quot;)
+}
+out.println(System.currentTimeMillis())
+Thread.sleep(1000)
+out.println(System.currentTimeMillis())
+
+ignore(UNSTABLE) {
+build(&quot;BigParser_Common_Services_Internal_BE_Deploy&quot;)
+}
+out.println(System.currentTimeMillis())
+Thread.sleep(1000)
+out.println(System.currentTimeMillis())
+
+
+ignore(UNSTABLE) {
+build(&quot;BigParser_FE_deploy&quot;)
+}</dsl>
+  <buildNeedsWorkspace>false</buildNeedsWorkspace>
+</com.cloudbees.plugins.flow.BuildFlow>
