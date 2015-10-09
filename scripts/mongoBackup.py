@@ -1,4 +1,4 @@
-import sys
+#:ximport sys
 import datetime
 import os
 from pymongo import MongoClient

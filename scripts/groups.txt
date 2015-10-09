@@ -1,2 +1,2 @@
-#backend=abc,xyz
+backend=abc,xyz
 frontend=123,456,789
