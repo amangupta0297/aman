@@ -1,9 +1,9 @@
 #:ximport sys
 import datetime
-import os
-from pymongo import MongoClient
-import logging
-import tarfile
+#import os
+#from pymongo import MongoClient
+#import logging
+#import tarfile
 
 def createCompleteDatabaseBackup(database, backupTime, getInternalIP):
     databaseBackupLocation = "/tmp/mongodump-"+backupTime
